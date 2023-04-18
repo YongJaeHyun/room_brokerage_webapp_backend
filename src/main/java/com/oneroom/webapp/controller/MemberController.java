@@ -85,15 +85,14 @@ public class MemberController {
 	}
 
 	@PutMapping("/user")
-	public ResponseEntity<?> updateUserInfo(@RequestBody MemberDTO userDTO) {
+	public ResponseEntity<?> updateUserInfo(@RequestBody MemberDTO dto) {
 		try {
-			String nickname = userDTO.getNickname();
-			String password = passwordEncoder.encode(userDTO.getPw());
-			String memberId = userDTO.getMemberId();
-			String address = userDTO.getAddress();
-			String phone = userDTO.getPhone();
-			
-			
+			String nickname = dto.getNickname();
+			String password = passwordEncoder.encode(dto.getPw());
+			String memberId = dto.getMemberId();
+			String address = dto.getAddress();
+			String phone = dto.getPhone();
+					
 			memberService.update(nickname, password, address, phone, memberId);
 			return ResponseEntity.ok().body(null);
 		} catch (Exception e) {

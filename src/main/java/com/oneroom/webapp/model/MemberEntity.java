@@ -22,13 +22,13 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(uniqueConstraints= {@UniqueConstraint(columnNames="uuid")}, name= "MEMBER")
+@Table(uniqueConstraints= {@UniqueConstraint(columnNames="memberUuid")}, name= "MEMBER")
 public class MemberEntity {
 	@Id
 	@GeneratedValue(generator="system-uuid")
 	@GenericGenerator(name="system-uuid", strategy="uuid")
 	@Column(nullable=false)
-	private String uuid;
+	private String memberUuid;
 	
 	@Column(nullable=false)
 	private String memberId;
@@ -43,6 +43,10 @@ public class MemberEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "WISH_LIST") 
 	private WishlistEntity wishlistByMember;
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "REVIEW") 
+	private ReviewEntity reviewByMember;
 	
 	private String nickname;
 	private String address;
