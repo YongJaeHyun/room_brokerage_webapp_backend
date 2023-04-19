@@ -26,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/auth")
 public class MemberController {
 	@Autowired
-	private MemberService memberService;
+	private MemberService service;
 
 	@Autowired
 	private TokenProvider tokenProvider;
@@ -38,11 +38,16 @@ public class MemberController {
 		try {
 			MemberEntity user = MemberEntity.builder().memberId(userDTO.getMemberId())
 					.pw(passwordEncoder.encode(userDTO.getPw())).build();
-
-			MemberEntity registeredUser = memberService.create(user);
-			MemberDTO responseUserDTO = MemberDTO.builder().memberId(registeredUser.getMemberId())
-					.nickname(registeredUser.getNickname()).build();
-			return ResponseEntity.ok().body(responseUserDTO);
+			if(service.getByMemberId(userDTO.getMemberId()) == null) {
+				MemberEntity registeredUser = service.create(user);
+				MemberDTO responseUserDTO = MemberDTO.builder().memberId(registeredUser.getMemberId())
+						.nickname(registeredUser.getNickname()).build();
+				return ResponseEntity.ok().body(responseUserDTO);
+			}
+			else {
+				ResponseDTO<?> responseDTO = ResponseDTO.builder().error("이미 존재하는 아이디입니다.").build();
+				return ResponseEntity.badRequest().body(responseDTO);
+			}
 		} catch (Exception e) {
 			String error = e.getMessage();
 			ResponseDTO<?> responseDTO = ResponseDTO.builder().error(error).build();
@@ -52,7 +57,7 @@ public class MemberController {
 
 	@PostMapping("/signin")
 	public ResponseEntity<?> authenticate(@RequestBody MemberDTO memberDTO) {
-		MemberEntity member = memberService.getByCredentials(memberDTO.getMemberId(), memberDTO.getPw(), passwordEncoder);
+		MemberEntity member = service.getByCredentials(memberDTO.getMemberId(), memberDTO.getPw(), passwordEncoder);
 
 		if (member != null) {
 			final String token = tokenProvider.create(member);
@@ -67,15 +72,13 @@ public class MemberController {
 
 	@GetMapping("/user")
 	public ResponseEntity<?> getUserInfo(@RequestParam String memberId) {
-		MemberEntity user = memberService.getByMemberId(memberId);
+		MemberEntity user = service.getByMemberId(memberId);
 		log.info("user: " + user);
 		if (user != null) {
 			final MemberDTO responseUserDTO = MemberDTO.builder()
 					.nickname(user.getNickname())
 					.address(user.getAddress())
 					.phone(user.getPhone())
-					.review_r(user.getReview_r())
-					.review_w(user.getReview_w())
 					.build();
 			return ResponseEntity.ok().body(responseUserDTO);
 		} else {
@@ -87,13 +90,12 @@ public class MemberController {
 	@PutMapping("/user")
 	public ResponseEntity<?> updateUserInfo(@RequestBody MemberDTO dto) {
 		try {
-			String nickname = dto.getNickname();
-			String password = passwordEncoder.encode(dto.getPw());
-			String memberId = dto.getMemberId();
-			String address = dto.getAddress();
-			String phone = dto.getPhone();
+			MemberEntity entity = service.getByMemberId(dto.getMemberId());
+			entity.setNickname(dto.getNickname());
+			entity.setAddress(dto.getAddress());
+			entity.setPhone(dto.getPhone());
 					
-			memberService.update(nickname, password, address, phone, memberId);
+			service.update(entity);
 			return ResponseEntity.ok().body(null);
 		} catch (Exception e) {
 			String error = e.getMessage();
@@ -103,10 +105,10 @@ public class MemberController {
 	}
 	
 	@DeleteMapping("/user")
-	public ResponseEntity<?> deleteUser(@RequestBody MemberDTO userDTO) {
+	public ResponseEntity<?> deleteUser(@RequestBody MemberDTO dto) {
 		try {	
-			String memberId = userDTO.getMemberId();
-			memberService.delete(memberId);
+			String memberId = dto.getMemberId();
+			service.delete(memberId);
 			return ResponseEntity.ok().body(null);
 		} catch (Exception e) {
 			String error = e.getMessage();

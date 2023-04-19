@@ -34,8 +34,8 @@ public class MemberService {
 		return memberRepository.save(memberEntity);
 	}
 	
-	public void update(final String nickname, final String pw, final String address, final String phone, final String memberId) {
-		memberRepository.updateUserInfo(nickname, pw, address, phone, memberId);
+	public void update(final MemberEntity entity) {
+		memberRepository.save(entity);
 	}
 	
 	public void delete(final String memberId) {
