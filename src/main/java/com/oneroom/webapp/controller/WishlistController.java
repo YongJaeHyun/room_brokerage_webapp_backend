@@ -1,18 +1,16 @@
 package com.oneroom.webapp.controller;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.oneroom.webapp.dto.ResponseDTO;
 import com.oneroom.webapp.dto.WishlistDTO;
 import com.oneroom.webapp.model.WishlistEntity;
 import com.oneroom.webapp.service.WishlistService;
@@ -33,17 +31,32 @@ public class WishlistController {
 		
 		entity.setMemberId(memberId);
 		
-		service.create(entity);
+		WishlistEntity wishlist = service.create(entity);
 		// HTTP Status 200 상태로 response 를 전송한다.
-		return ResponseEntity.ok().body(null);
+		return ResponseEntity.ok().body(wishlist);
 	}
 	
-	@GetMapping
-	public ResponseEntity<?> retrieveBoard(@AuthenticationPrincipal String memberId) {
-		List<WishlistEntity> entities = service.retrieve(memberId);
-		List<WishlistDTO> dtos = entities.stream().map(WishlistDTO::new).collect(Collectors.toList());
-		ResponseDTO<WishlistDTO> response = ResponseDTO.<WishlistDTO>builder().data(dtos).build();
+	@GetMapping("/exist/memberId+boardUuid")
+	public ResponseEntity<?> existsByMemberIdAndBoardUuid(@AuthenticationPrincipal String memberId, @RequestParam String boardUuid) {
+		boolean isExist = service.existsByMemberIdAndBoardUuid(memberId, boardUuid);
 		// HTTP Status 200 상태로 response 를 전송한다.
-		return ResponseEntity.ok().body(response);
+		return ResponseEntity.ok().body(isExist);
+	}
+	
+	@GetMapping("/memberId+boardUuid")
+	public ResponseEntity<?> getByMemberIdAndBoardUuid(@AuthenticationPrincipal String memberId, @RequestParam String boardUuid) {
+		WishlistEntity entity = service.getByMemberIdAndBoardUuid(memberId, boardUuid);
+		log.info(entity.toString());
+		// HTTP Status 200 상태로 response 를 전송한다.
+		return ResponseEntity.ok().body(entity);
+	}
+	
+	@PutMapping
+	public ResponseEntity<?> updateWishlist(@AuthenticationPrincipal String memberId, @RequestBody WishlistDTO dto){
+		WishlistEntity entity = service.getByMemberIdAndBoardUuid(memberId, dto.getBoardUuid());
+		
+		entity.setState(dto.isState());
+		WishlistEntity wishlist = service.update(entity);
+		return ResponseEntity.ok().body(wishlist);
 	}
 }

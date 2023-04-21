@@ -8,4 +8,6 @@ import com.oneroom.webapp.model.WishlistEntity;
 
 public interface WishlistRepository extends JpaRepository<WishlistEntity, String> {
 	List<WishlistEntity> findByMemberId(String memberId);
+	boolean existsByMemberIdAndBoardUuid(String memberId, String BoardUuid);
+	WishlistEntity getByMemberIdAndBoardUuid(String memberId, String boardUuid);
 }

@@ -1,7 +1,5 @@
 package com.oneroom.webapp.service;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,13 +14,25 @@ public class WishlistService {
 	@Autowired
 	private WishlistRepository repository;
 	
-	public void create(final WishlistEntity entity) {
+	public WishlistEntity create(final WishlistEntity entity) {
 		validate(entity);
-		repository.save(entity);
+		return repository.save(entity);
 	}
 	
-	public List<WishlistEntity> retrieve(final String memberId){
-		return repository.findByMemberId(memberId);
+	public boolean existsByMemberIdAndBoardUuid(final String memberId, final String boardUuid) {
+		if (memberId == null) {
+			log.warn("Unknown user.");
+			throw new RuntimeException("Unknown user.");
+		}
+		return repository.existsByMemberIdAndBoardUuid(memberId, boardUuid);
+	}
+	
+	public WishlistEntity getByMemberIdAndBoardUuid(final String memberId, final String boardUuid){
+		return repository.getByMemberIdAndBoardUuid(memberId, boardUuid);
+	}
+	
+	public WishlistEntity update(final WishlistEntity entity) {
+		return repository.save(entity);
 	}
 	
 	public void validate(final WishlistEntity entity) {
