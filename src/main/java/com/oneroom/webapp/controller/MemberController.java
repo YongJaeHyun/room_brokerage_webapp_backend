@@ -2,6 +2,7 @@ package com.oneroom.webapp.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -10,7 +11,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.oneroom.webapp.dto.ResponseDTO;
@@ -71,7 +71,7 @@ public class MemberController {
 	}
 
 	@GetMapping("/user")
-	public ResponseEntity<?> getUserInfo(@RequestParam String memberId) {
+	public ResponseEntity<?> getUserInfo(@AuthenticationPrincipal String memberId) {
 		MemberEntity user = service.getByMemberId(memberId);
 		log.info("user: " + user);
 		if (user != null) {
@@ -88,9 +88,9 @@ public class MemberController {
 	}
 
 	@PutMapping("/user")
-	public ResponseEntity<?> updateUserInfo(@RequestBody MemberDTO dto) {
+	public ResponseEntity<?> updateUserInfo(@AuthenticationPrincipal String memberId, @RequestBody MemberDTO dto) {
 		try {
-			MemberEntity entity = service.getByMemberId(dto.getMemberId());
+			MemberEntity entity = service.getByMemberId(memberId);
 			entity.setNickname(dto.getNickname());
 			entity.setAddress(dto.getAddress());
 			entity.setPhone(dto.getPhone());
@@ -105,9 +105,8 @@ public class MemberController {
 	}
 	
 	@DeleteMapping("/user")
-	public ResponseEntity<?> deleteUser(@RequestBody MemberDTO dto) {
+	public ResponseEntity<?> deleteUser(@AuthenticationPrincipal String memberId) {
 		try {	
-			String memberId = dto.getMemberId();
 			service.delete(memberId);
 			return ResponseEntity.ok().body(null);
 		} catch (Exception e) {

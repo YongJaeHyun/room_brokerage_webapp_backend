@@ -28,8 +28,6 @@ public class MemberService {
 		
 		final String nickname = RandomNicknameGenerator.generate();
 		memberEntity.setNickname(nickname);
-		memberEntity.setLeaseBoardByMember(null);
-		memberEntity.setWishlistByMember(null);
 		
 		return memberRepository.save(memberEntity);
 	}
