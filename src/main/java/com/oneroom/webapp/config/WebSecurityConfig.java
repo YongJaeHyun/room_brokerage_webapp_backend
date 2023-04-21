@@ -38,7 +38,7 @@ public class WebSecurityConfig {
 	protected SecurityFilterChain SecurityConfiguration(HttpSecurity http) throws Exception {
 		http.cors().and().csrf().disable().httpBasic().disable().sessionManagement()
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().authorizeRequests()
-				.antMatchers("/", "/auth/**").permitAll().anyRequest().authenticated()
+				.antMatchers("/", "/auth/**", "/board", "/board/boardUuid").permitAll().anyRequest().authenticated()
 				.and()
 				.headers().frameOptions().disable();
 
