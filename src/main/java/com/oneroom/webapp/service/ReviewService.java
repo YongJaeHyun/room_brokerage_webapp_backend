@@ -24,4 +24,8 @@ public class ReviewService {
 	public List<ReviewEntity> findByWriteId(final String memberId) {
 		return repository.findByWriteId(memberId);
 	}
+	
+	public void update(final ReviewEntity entity) {
+		repository.save(entity);
+	}
 }
