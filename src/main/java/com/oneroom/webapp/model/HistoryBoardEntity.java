@@ -30,7 +30,6 @@ public class HistoryBoardEntity {
 	@GenericGenerator(name = "system-uuid", strategy = "uuid")
 	@Column(nullable=false)
 	private String hbUuid;
-	
 	private String boardUuid;
 	private String title;
 	private String contracted;

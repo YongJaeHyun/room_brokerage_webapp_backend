@@ -1,5 +1,6 @@
 package com.oneroom.webapp.controller;
 
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -8,9 +9,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.oneroom.webapp.dto.HistoryBoardDTO;
@@ -37,18 +38,37 @@ public class HistoryBoardController {
 		log.info("Log: dto => entity ok!");
 		
 		entity.setBoardUuid(dto.getBoardUuid());
+		entity.setUpdatedDatetime(new Date());
+		
 		service.create(entity);
 		// HTTP Status 200 상태로 response 를 전송한다.
-		return ResponseEntity.ok().body("로그 저장 완료.");
+		return ResponseEntity.ok().body(null);
 	}
 	
-	@GetMapping
-	public ResponseEntity<?> getHistoryBoardByBoardId(@AuthenticationPrincipal String memberId, @RequestParam String boardUuid) {
+	@PutMapping
+	public ResponseEntity<?> updateHistoryBoard(@AuthenticationPrincipal String memberId, @RequestBody HistoryBoardDTO dto) {
 		if(memberId == null) {
 			new RuntimeException("Unknown User");
 		}
 		
-		List<HistoryBoardEntity> entities = service.findByBoardUuid(boardUuid);;
+		HistoryBoardEntity entity = service.findByBoardUuid(dto.getBoardUuid());
+		log.info("Log: dto => entity ok!");
+	
+		entity.setUpdatedDatetime(new Date());
+		entity.setContracted(dto.getContracted());
+		
+		service.update(entity);
+		// HTTP Status 200 상태로 response 를 전송한다.
+		return ResponseEntity.ok().body(null);
+	}
+	
+	@GetMapping
+	public ResponseEntity<?> getAllHistoryBoard(@AuthenticationPrincipal String memberId) {
+		if(memberId == null) {
+			new RuntimeException("Unknown User");
+		}
+		
+		List<HistoryBoardEntity> entities = service.getAllHistoryBoard();
 		List<HistoryBoardDTO> dtos = entities.stream().map(HistoryBoardDTO::new).collect(Collectors.toList());
 		ResponseDTO<HistoryBoardDTO> response = ResponseDTO.<HistoryBoardDTO>builder().data(dtos).build();
 		// HTTP Status 200 상태로 response 를 전송한다.

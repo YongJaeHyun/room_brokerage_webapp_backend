@@ -14,12 +14,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 public class HistoryBoardDTO {
+	private String hbUuid;
 	private String title;
 	private String contracted;
 	private Date updatedDatetime;
 	private String boardUuid;
 	
 	public HistoryBoardDTO(final HistoryBoardEntity entity) {
+		this.hbUuid = entity.getHbUuid();
 		this.title = entity.getTitle();
 		this.contracted = entity.getContracted();
 		this.boardUuid = entity.getBoardUuid();
@@ -28,6 +30,7 @@ public class HistoryBoardDTO {
 
 	public static HistoryBoardEntity toEntity(final HistoryBoardDTO dto) {
 		return HistoryBoardEntity.builder()
+				.hbUuid(dto.getHbUuid())
 				.title(dto.getTitle())
 				.contracted(dto.getContracted())
 				.updatedDatetime(dto.getUpdatedDatetime())

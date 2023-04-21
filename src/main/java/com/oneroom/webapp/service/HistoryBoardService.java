@@ -17,7 +17,15 @@ public class HistoryBoardService {
 		repository.save(entity);
 	}
 	
-	public List<HistoryBoardEntity> findByBoardUuid(final String boardUuid){ 
+	public List<HistoryBoardEntity> getAllHistoryBoard(){ 
+		return repository.findAll();
+	}
+	
+	public HistoryBoardEntity findByBoardUuid(final String boardUuid) {
 		return repository.findByBoardUuid(boardUuid);
+	}
+	
+	public void update(final HistoryBoardEntity entity) {
+		repository.save(entity);
 	}
 }
